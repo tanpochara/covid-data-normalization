@@ -11,6 +11,11 @@ func GetCovidSummary(c *gin.Context) {
 
 	covidData, err := utils.GetCovidData()
 
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
 	groupByProvince := make(map[string]int)
 
 	groupByAge := map[string]int{
@@ -30,10 +35,6 @@ func GetCovidSummary(c *gin.Context) {
 
 		//update count of each age group
 		UpdateAge(age, groupByAge)
-	}
-
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{"Province": groupByProvince, "AgeGroup": groupByAge})
